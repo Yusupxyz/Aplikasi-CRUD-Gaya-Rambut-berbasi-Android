@@ -36,7 +36,7 @@ Route::delete('/gaya/{id}',[GayaApiController::class, 'destroy']);
 Route::get('/wajah',[WajahApiController::class, 'index']);
 Route::get('/wajah/{id}',[WajahApiController::class, 'show']);
 Route::post('/wajah',[WajahApiController::class, 'store']);
-Route::put('/wajah/{id}',[WajahApiController::class, 'update']);
+Route::post('/wajah/{id}',[WajahApiController::class, 'update']);
 Route::delete('/wajah/{id}',[WajahApiController::class, 'destroy']);
 
 // API Gaya Rambut

@@ -1,42 +1,56 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:two_kang_haircut/screen/wajah/edit_wajah_screen.dart';
 import 'package:two_kang_haircut/screen/wajah/tambah_wajah_screen.dart';
+import 'package:http/http.dart' as http;
 
-class WajahScreen extends StatelessWidget {
+class WajahScreen extends StatefulWidget {
   const WajahScreen({super.key});
 
   @override
+  State<WajahScreen> createState() => _WajahScreenState();
+}
+
+class _WajahScreenState extends State<WajahScreen> {
+  final String url = 'http://10.0.2.2:8000/api/wajah';
+  final String urlStorage = 'http://10.0.2.2:8000/images/';
+
+  Future getWajah() async {
+    var response = await http.get(Uri.parse(url));
+    return json.decode(response.body);
+  }
+
+  Future deleteWajah(String id) async {
+    var response = await http.delete(Uri.parse("$url/$id"));
+    return json.decode(response.body);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<dynamic> list = [
-      {
-        'id': 0,
-        'nama': 'Andi',
-        'wajah':
-            'https://akcdn.detik.net.id/community/media/visual/2019/02/19/42393387-9c5c-4be4-97b8-49260708719e.jpeg',
-      },
-      {
-        'id': 1,
-        'nama': 'Bunga',
-        'wajah':
-            'https://img-highend.okezone.com/okz/900/pictureArticle/images_3C38pt5T_m4d44b.jpg',
-      },
-    ];
     return Scaffold(
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white, size: 30),
         title: const Text(
           'Data Wajah',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
+        backgroundColor: const Color(0xffEB1616),
       ),
       body: SafeArea(
           child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: ListView.builder(
+        padding: const EdgeInsets.all(10.0),
+        child: FutureBuilder(
+            future: getWajah(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
                     shrinkWrap: true,
-                    itemCount: list.length,
+                    itemCount: snapshot.data['data'].length,
                     itemBuilder: (BuildContext context, int index) {
                       return Card(
                         shadowColor: Colors.grey.shade300,
@@ -47,7 +61,8 @@ class WajahScreen extends StatelessWidget {
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(10.0),
                               child: Image.network(
-                                list[index]['wajah'],
+                                urlStorage +
+                                    snapshot.data['data'][index]['wajah'],
                                 height: 150.0,
                                 width: 100.0,
                               ),
@@ -60,7 +75,9 @@ class WajahScreen extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black),
                                     children: [
-                                  TextSpan(text: list[index]['nama'])
+                                  TextSpan(
+                                      text: snapshot.data['data'][index]
+                                          ['nama'])
                                 ])),
                             trailing: Column(
                               children: [
@@ -69,8 +86,9 @@ class WajahScreen extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              const EditWajahScreen()),
+                                          builder: (context) => EditWajahScreen(
+                                              wajah: snapshot.data['data']
+                                                  [index])),
                                     );
                                   },
                                   child: const Icon(
@@ -103,12 +121,21 @@ class WajahScreen extends StatelessWidget {
                                         ],
                                       ),
                                     );
-                
+
                                     if (result == null || !result) {
                                       return;
                                     }
                                     //disini api hapus dieksekusi
-                                    print('data terhapus');
+                                    deleteWajah(snapshot.data['data'][index]
+                                                ['id']
+                                            .toString())
+                                        .then((value) {
+                                      setState(() {});
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  "Data berhasil dihapus")));
+                                    });
                                   },
                                   child: const Icon(
                                     Icons.delete,
@@ -120,8 +147,12 @@ class WajahScreen extends StatelessWidget {
                           ),
                         ),
                       );
-                    }),
-              ))),
+                    });
+              } else {
+                return const Text('Data kosong');
+              }
+            }),
+      ))),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
         tooltip: 'Increment',

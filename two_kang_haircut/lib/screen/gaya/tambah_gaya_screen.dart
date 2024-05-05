@@ -1,7 +1,20 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:two_kang_haircut/screen/gaya/gaya_screen.dart';
 
 class TambahGayaScreen extends StatelessWidget {
-  const TambahGayaScreen({super.key});
+  TambahGayaScreen({super.key});
+  final TextEditingController _gayaController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final String url = 'http://10.0.2.2:8000/api/gaya';
+
+  Future saveGaya() async {
+    final response =
+        await http.post(Uri.parse(url), body: {"gaya": _gayaController.text});
+    return json.decode(response.body);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,27 +31,48 @@ class TambahGayaScreen extends StatelessWidget {
       body: SafeArea(
           child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 27),
-        child: Column(
-          children: [
-            const TextField(
-              decoration: InputDecoration(
-                  hintStyle: TextStyle(color: Colors.grey),
-                  hintText: "Masukkan gaya"),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            ElevatedButton(
-              onPressed: null,
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.blue),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+               TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Data gaya rambut harus diisi";
+                  }
+                  return null;
+                },
+                controller: _gayaController,
+                decoration: const InputDecoration(
+                    hintStyle: TextStyle(color: Colors.grey),
+                    hintText: "Masukkan gaya"),
               ),
-              child: const Text(
-                'Simpan',
-                style: TextStyle(fontSize: 16, color: Colors.white),
+              const SizedBox(
+                height: 5,
               ),
-            )
-          ],
+              ElevatedButton(
+                 onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    saveGaya().then((value) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const GayaScreen()));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text("Data berhasil disimpan")));
+                    });
+                  }
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.blue),
+                ),
+                child: const Text(
+                  'Simpan',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              )
+            ],
+          ),
         ),
       )),
     );

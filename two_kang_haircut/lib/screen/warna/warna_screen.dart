@@ -1,24 +1,35 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:two_kang_haircut/main.dart';
 import 'package:two_kang_haircut/screen/warna/edit_warna_screen.dart';
 import 'package:two_kang_haircut/screen/warna/tambah_warna_screen.dart';
+import 'package:http/http.dart' as http;
 
-class WarnaScreen extends StatelessWidget {
+class WarnaScreen extends StatefulWidget {
   const WarnaScreen({super.key});
 
   @override
+  State<WarnaScreen> createState() => _WarnaScreenState();
+}
+
+class _WarnaScreenState extends State<WarnaScreen> {
+  final String url = 'http://10.0.2.2:8000/api/warna';
+
+  Future getWarna() async {
+    var response = await http.get(Uri.parse(url));
+    return json.decode(response.body);
+  }
+
+  Future deleteWarna(String id) async {
+    var response = await http.delete(Uri.parse("$url/$id"));
+    return json.decode(response.body);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<dynamic> list = [
-      {
-        'id': 0,
-        'warna': 'Merah',
-      },
-      {
-        'id': 1,
-        'warna': 'Kuning',
-      },
-    ];
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white, size: 30),
@@ -27,15 +38,26 @@ class WarnaScreen extends StatelessWidget {
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MainApp()),
+            ),
+        ),
         backgroundColor: const Color(0xffEB1616),
       ),
       body: SafeArea(
           child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: ListView.builder(
+        padding: const EdgeInsets.all(10.0),
+        child: FutureBuilder(
+            future: getWarna(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
                     shrinkWrap: true,
-                    itemCount: list.length,
+                    itemCount: snapshot.data['data'].length,
                     itemBuilder: (BuildContext context, int index) {
                       return Card(
                         shadowColor: Colors.grey.shade300,
@@ -51,7 +73,9 @@ class WarnaScreen extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black),
                                     children: [
-                                  TextSpan(text: list[index]['warna'])
+                                  TextSpan(
+                                      text: snapshot.data['data'][index]
+                                          ['warna'])
                                 ])),
                             trailing: Column(
                               children: [
@@ -60,8 +84,9 @@ class WarnaScreen extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              const EditWarnaScreen()),
+                                          builder: (context) => EditWarnaScreen(
+                                              warna: snapshot.data['data']
+                                                  [index])),
                                     );
                                   },
                                   child: const Icon(
@@ -94,12 +119,21 @@ class WarnaScreen extends StatelessWidget {
                                         ],
                                       ),
                                     );
-                
+
                                     if (result == null || !result) {
                                       return;
                                     }
                                     //disini api hapus dieksekusi
-                                    print('data terhapus');
+                                    deleteWarna(snapshot.data['data'][index]
+                                                ['id']
+                                            .toString())
+                                        .then((value) {
+                                      setState(() {});
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  "Data berhasil dihapus")));
+                                    });
                                   },
                                   child: const Icon(
                                     Icons.delete,
@@ -111,15 +145,19 @@ class WarnaScreen extends StatelessWidget {
                           ),
                         ),
                       );
-                    }),
-              ))),
+                    });
+              } else {
+                return const Text('Data kosong');
+              }
+            }),
+      ))),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
         tooltip: 'Increment',
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const TambahWarnaScreen()),
+            MaterialPageRoute(builder: (context) => TambahWarnaScreen()),
           );
         },
         child: const Icon(Icons.add, color: Colors.white, size: 28),

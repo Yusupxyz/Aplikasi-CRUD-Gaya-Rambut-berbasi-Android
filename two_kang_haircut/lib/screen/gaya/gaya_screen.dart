@@ -1,24 +1,34 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:two_kang_haircut/screen/gaya/edit_gaya_screen.dart';
 import 'package:two_kang_haircut/screen/gaya/tambah_gaya_screen.dart';
+import 'package:http/http.dart' as http;
 
-class GayaScreen extends StatelessWidget {
+class GayaScreen extends StatefulWidget {
   const GayaScreen({super.key});
 
   @override
+  State<GayaScreen> createState() => _GayaScreenState();
+}
+
+class _GayaScreenState extends State<GayaScreen> {
+  final String url = 'http://10.0.2.2:8000/api/gaya';
+
+  Future getGaya() async {
+    var response = await http.get(Uri.parse(url));
+    return json.decode(response.body);
+  }
+
+  Future deleteGaya(String id) async {
+    var response = await http.delete(Uri.parse("$url/$id"));
+    return json.decode(response.body);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<dynamic> list = [
-      {
-        'id': 0,
-        'gaya': 'Muhawk',
-      },
-      {
-        'id': 1,
-        'gaya': 'Wolf Cut',
-      },
-    ];
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white, size: 30),
@@ -32,10 +42,14 @@ class GayaScreen extends StatelessWidget {
       body: SafeArea(
           child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: ListView.builder(
+        padding: const EdgeInsets.all(10.0),
+        child: FutureBuilder(
+            future: getGaya(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
                     shrinkWrap: true,
-                    itemCount: list.length,
+                    itemCount: snapshot.data['data'].length,
                     itemBuilder: (BuildContext context, int index) {
                       return Card(
                         shadowColor: Colors.grey.shade300,
@@ -45,13 +59,15 @@ class GayaScreen extends StatelessWidget {
                           child: ListTile(
                             title: RichText(
                                 text: TextSpan(
-                                    text: 'Warna: ',
+                                    text: 'Gaya Rambut: ',
                                     style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black),
                                     children: [
-                                  TextSpan(text: list[index]['gaya'])
+                                  TextSpan(
+                                      text: snapshot.data['data'][index]
+                                          ['gaya'])
                                 ])),
                             trailing: Column(
                               children: [
@@ -61,7 +77,8 @@ class GayaScreen extends StatelessWidget {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const EditGayaScreen()),
+                                               EditGayaScreen(gaya: snapshot.data['data']
+                                                  [index])),
                                     );
                                   },
                                   child: const Icon(
@@ -94,12 +111,21 @@ class GayaScreen extends StatelessWidget {
                                         ],
                                       ),
                                     );
-                
+
                                     if (result == null || !result) {
                                       return;
                                     }
                                     //disini api hapus dieksekusi
-                                    print('data terhapus');
+                                    deleteGaya(snapshot.data['data'][index]
+                                                ['id']
+                                            .toString())
+                                        .then((value) {
+                                      setState(() {});
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  "Data berhasil dihapus")));
+                                    });
                                   },
                                   child: const Icon(
                                     Icons.delete,
@@ -111,17 +137,20 @@ class GayaScreen extends StatelessWidget {
                           ),
                         ),
                       );
-                    }),
-              ))),
+                    });
+              } else {
+                return const Text('Data kosong');
+              }
+            }),
+      ))),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
         tooltip: 'Increment',
         onPressed: () {
-           Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const TambahGayaScreen()),
-                  );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => TambahGayaScreen()),
+          );
         },
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
