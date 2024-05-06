@@ -7,7 +7,7 @@ class EditGayaScreen extends StatelessWidget {
   EditGayaScreen({super.key, required this.gaya});
   final TextEditingController _gayaController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String url = 'http://10.0.2.2:8000/api/gaya';
+  final String url = 'http://devapp2024.000webhostapp.com/api/gaya';
 
   Future updateGaya() async {
     // ignore: unused_local_variable

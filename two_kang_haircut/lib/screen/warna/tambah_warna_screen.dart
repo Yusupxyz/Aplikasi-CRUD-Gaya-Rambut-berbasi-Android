@@ -11,7 +11,7 @@ class TambahWarnaScreen extends StatelessWidget {
 
   final TextEditingController _warnaController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String url = 'http://10.0.2.2:8000/api/warna';
+  final String url = 'http://devapp2024.000webhostapp.com/api/warna';
 
   Future saveWarna() async {
     final response =

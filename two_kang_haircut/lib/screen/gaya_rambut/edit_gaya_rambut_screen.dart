@@ -36,9 +36,9 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
   String? selectedSumber;
   final TextEditingController _panjangController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String url = 'http://10.0.2.2:8000/api/gayarambut';
-  final String urlGaya = 'http://10.0.2.2:8000/api/gaya';
-  final String urlWarna = 'http://10.0.2.2:8000/api/warna';
+  final String url = 'http://devapp2024.000webhostapp.com/api/gayarambut';
+  final String urlGaya = 'http://devapp2024.000webhostapp.com/api/gaya';
+  final String urlWarna = 'http://devapp2024.000webhostapp.com/api/warna';
 
   Future updateGayaRambut() async {
     final response =

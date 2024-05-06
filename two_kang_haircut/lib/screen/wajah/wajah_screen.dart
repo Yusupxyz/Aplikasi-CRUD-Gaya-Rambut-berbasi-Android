@@ -16,8 +16,8 @@ class WajahScreen extends StatefulWidget {
 }
 
 class _WajahScreenState extends State<WajahScreen> {
-  final String url = 'http://10.0.2.2:8000/api/wajah';
-  final String urlStorage = 'http://10.0.2.2:8000/images/';
+  final String url = 'http://devapp2024.000webhostapp.com/api/wajah';
+  final String urlStorage = 'http://devapp2024.000webhostapp.com/images/';
 
   Future getWajah() async {
     var response = await http.get(Uri.parse(url));

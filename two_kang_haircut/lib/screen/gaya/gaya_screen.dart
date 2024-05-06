@@ -16,7 +16,7 @@ class GayaScreen extends StatefulWidget {
 }
 
 class _GayaScreenState extends State<GayaScreen> {
-  final String url = 'http://10.0.2.2:8000/api/gaya';
+  final String url = 'http://devapp2024.000webhostapp.com/api/gaya';
 
   Future getGaya() async {
     var response = await http.get(Uri.parse(url));

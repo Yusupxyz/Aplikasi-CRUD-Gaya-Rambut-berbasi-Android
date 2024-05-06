@@ -19,7 +19,7 @@ class GayaRambutScreen extends StatefulWidget {
 class _GayaRambutScreenState extends State<GayaRambutScreen> {
   @override
   Widget build(BuildContext context) {
-    const String url = 'http://10.0.2.2:8000/api/gayarambut';
+    const String url = 'http://devapp2024.000webhostapp.com/api/gayarambut';
 
     Future getGayaRambut() async {
       var response = await http.get(Uri.parse(url));

@@ -16,7 +16,7 @@ class WarnaScreen extends StatefulWidget {
 }
 
 class _WarnaScreenState extends State<WarnaScreen> {
-  final String url = 'http://10.0.2.2:8000/api/warna';
+  final String url = 'http://devapp2024.000webhostapp.com/api/warna';
 
   Future getWarna() async {
     var response = await http.get(Uri.parse(url));

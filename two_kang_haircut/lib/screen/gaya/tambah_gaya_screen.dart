@@ -8,7 +8,7 @@ class TambahGayaScreen extends StatelessWidget {
   TambahGayaScreen({super.key});
   final TextEditingController _gayaController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String url = 'http://10.0.2.2:8000/api/gaya';
+  final String url = 'http://devapp2024.000webhostapp.com/api/gaya';
 
   Future saveGaya() async {
     final response =

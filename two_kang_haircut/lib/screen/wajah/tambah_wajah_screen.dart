@@ -19,7 +19,7 @@ class _TambahWajahScreenState extends State<TambahWajahScreen> {
   final picker = ImagePicker();
   final TextEditingController _wajahController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String url = 'http://10.0.2.2:8000/api/wajah';
+  final String url = 'http://devapp2024.000webhostapp.com/api/wajah';
 
   Future saveWajah() async {
     var uri = Uri.parse(url);
