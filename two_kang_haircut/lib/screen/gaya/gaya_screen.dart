@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:two_kang_haircut/main.dart';
 import 'package:two_kang_haircut/screen/gaya/edit_gaya_screen.dart';
 import 'package:two_kang_haircut/screen/gaya/tambah_gaya_screen.dart';
 import 'package:http/http.dart' as http;
@@ -38,6 +39,13 @@ class _GayaScreenState extends State<GayaScreen> {
               fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: const Color(0xffEB1616),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MainApp()),
+          ),
+        ),
       ),
       body: SafeArea(
           child: SingleChildScrollView(
@@ -76,8 +84,8 @@ class _GayaScreenState extends State<GayaScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                               EditGayaScreen(gaya: snapshot.data['data']
+                                          builder: (context) => EditGayaScreen(
+                                              gaya: snapshot.data['data']
                                                   [index])),
                                     );
                                   },

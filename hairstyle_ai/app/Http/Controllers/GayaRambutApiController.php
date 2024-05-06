@@ -14,7 +14,7 @@ class GayaRambutApiController extends Controller
      */
     public function index()
     {
-        $gayarambut = GayaRambut::all();
+        $gayarambut = GayaRambut::with('gaya','warna')->get();
         return response()->json([
             'message' => "Success",
             'code' => "200",
@@ -46,7 +46,7 @@ class GayaRambutApiController extends Controller
      */
     public function show($id)
     {
-        $gayarambut = GayaRambut::find($id);
+        $gayarambut = GayaRambut::with('gaya','warna')->find($id);
         return response()->json([
             'message' => "Success",
             'code' => "200",

@@ -7,10 +7,7 @@ import 'package:two_kang_haircut/screen/wajah/wajah_screen.dart';
 import 'package:two_kang_haircut/screen/warna/warna_screen.dart';
 
 void main() {
-  runApp(const MaterialApp(
-      debugShowCheckedModeBanner: false,
-
-    home: MainApp()));
+  runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -20,18 +17,19 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           "Two Kang's Haircut",
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: SizedBox(
-                  height: 45, child: Image.asset('assets/images/logo.png')),
-            )
-          ],
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: SizedBox(
+                height: 45, child: Image.asset('assets/images/logo.png')),
+          )
+        ],
         backgroundColor: const Color(0xffEB1616),
       ),
       body: SafeArea(
@@ -95,8 +93,7 @@ class MainApp extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const GayaScreen()),
+                    MaterialPageRoute(builder: (context) => const GayaScreen()),
                   );
                 },
                 child: Container(
