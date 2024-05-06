@@ -362,11 +362,6 @@
 									"key": "wajah",
 									"value": "ratu.jpg",
 									"type": "text"
-								},
-								{
-									"key": "jenis_kelamin",
-									"value": "L",
-									"type": "text"
 								}
 							]
 						},
@@ -391,19 +386,20 @@
 				{
 					"name": "Update Wajah",
 					"request": {
-						"method": "PUT",
+						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nama\":\"Saifullah\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nama",
+									"value": "asda",
+									"type": "text"
 								}
-							}
+							]
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/wajah/1",
+							"raw": "http://127.0.0.1:8000/api/wajah/5",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -415,7 +411,7 @@
 							"path": [
 								"api",
 								"wajah",
-								"1"
+								"5"
 							]
 						}
 					},
@@ -427,7 +423,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/wajah/1",
+							"raw": "http://127.0.0.1:8000/api/wajah/2",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -439,7 +435,7 @@
 							"path": [
 								"api",
 								"wajah",
-								"1"
+								"2"
 							]
 						}
 					},
