@@ -16,7 +16,8 @@ class WarnaScreen extends StatefulWidget {
 }
 
 class _WarnaScreenState extends State<WarnaScreen> {
-  final String url = 'http://devapp2024.000webhostapp.com/api/warna';
+  final String url = 'https://devapp2024.000webhostapp.com/api/warna';
+  final String urlDelete = 'https://devapp2024.000webhostapp.com/api/warna/delete';
 
   Future getWarna() async {
     var response = await http.get(Uri.parse(url));
@@ -24,7 +25,7 @@ class _WarnaScreenState extends State<WarnaScreen> {
   }
 
   Future deleteWarna(String id) async {
-    var response = await http.delete(Uri.parse("$url/$id"));
+    var response = await http.post(Uri.parse("$urlDelete/$id"));
     return json.decode(response.body);
   }
 

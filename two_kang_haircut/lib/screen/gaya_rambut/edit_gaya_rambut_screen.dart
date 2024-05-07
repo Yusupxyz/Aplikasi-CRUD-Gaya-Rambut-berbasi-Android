@@ -36,13 +36,13 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
   String? selectedSumber;
   final TextEditingController _panjangController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String url = 'http://devapp2024.000webhostapp.com/api/gayarambut';
+  final String url = 'http://devapp2024.000webhostapp.com/api/gayarambut/update';
   final String urlGaya = 'http://devapp2024.000webhostapp.com/api/gaya';
   final String urlWarna = 'http://devapp2024.000webhostapp.com/api/warna';
 
   Future updateGayaRambut() async {
     final response =
-        await http.put(Uri.parse("$url/${widget.gayaRambut['id']}"), body: {
+        await http.post(Uri.parse("$url/${widget.gayaRambut['id']}"), body: {
       "panjang": _panjangController.text,
       "id_warna": selectedWarna,
       "tekstur": selectedTekstur,

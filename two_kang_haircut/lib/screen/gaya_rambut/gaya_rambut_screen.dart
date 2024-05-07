@@ -20,6 +20,7 @@ class _GayaRambutScreenState extends State<GayaRambutScreen> {
   @override
   Widget build(BuildContext context) {
     const String url = 'http://devapp2024.000webhostapp.com/api/gayarambut';
+    const String urlDelete = 'http://devapp2024.000webhostapp.com/api/gayarambut/delete';
 
     Future getGayaRambut() async {
       var response = await http.get(Uri.parse(url));
@@ -27,7 +28,7 @@ class _GayaRambutScreenState extends State<GayaRambutScreen> {
     }
 
     Future deleteGayaRambut(String id) async {
-      var response = await http.delete(Uri.parse("$url/$id"));
+      var response = await http.post(Uri.parse("$urlDelete/$id"));
       return json.decode(response.body);
     }
 

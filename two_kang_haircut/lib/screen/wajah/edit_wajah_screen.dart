@@ -20,7 +20,7 @@ class EditWajahScreen extends StatefulWidget {
 class _EditWajahScreenState extends State<EditWajahScreen> {
   final TextEditingController _wajahController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String url = 'http://devapp2024.000webhostapp.com/api/wajah';
+  final String url = 'http://devapp2024.000webhostapp.com/api/wajah/update';
 
   File? _image;
   final picker = ImagePicker();

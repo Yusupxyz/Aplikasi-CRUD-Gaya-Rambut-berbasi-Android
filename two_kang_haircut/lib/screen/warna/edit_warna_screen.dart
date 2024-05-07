@@ -7,11 +7,11 @@ class EditWarnaScreen extends StatelessWidget {
   EditWarnaScreen({super.key, required this.warna});
   final TextEditingController _warnaController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String url = 'http://devapp2024.000webhostapp.com/api/warna';
+  final String url = 'http://devapp2024.000webhostapp.com/api/warna/update';
 
   Future updateWarna() async {
     // ignore: unused_local_variable
-    final response = await http.put(Uri.parse("$url/${warna['id']}"),
+    final response = await http.post(Uri.parse("$url/${warna['id']}"),
         body: {"warna": _warnaController.text});
   }
 

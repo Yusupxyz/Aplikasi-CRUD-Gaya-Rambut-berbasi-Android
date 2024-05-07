@@ -17,6 +17,7 @@ class GayaScreen extends StatefulWidget {
 
 class _GayaScreenState extends State<GayaScreen> {
   final String url = 'http://devapp2024.000webhostapp.com/api/gaya';
+  final String urlDelete = 'http://devapp2024.000webhostapp.com/api/gaya/delete';
 
   Future getGaya() async {
     var response = await http.get(Uri.parse(url));
@@ -24,7 +25,7 @@ class _GayaScreenState extends State<GayaScreen> {
   }
 
   Future deleteGaya(String id) async {
-    var response = await http.delete(Uri.parse("$url/$id"));
+    var response = await http.delete(Uri.parse("$urlDelete/$id"));
     return json.decode(response.body);
   }
 

@@ -17,6 +17,7 @@ class WajahScreen extends StatefulWidget {
 
 class _WajahScreenState extends State<WajahScreen> {
   final String url = 'http://devapp2024.000webhostapp.com/api/wajah';
+  final String urlDelete = 'http://devapp2024.000webhostapp.com/api/wajah/delete';
   final String urlStorage = 'http://devapp2024.000webhostapp.com/images/';
 
   Future getWajah() async {
@@ -25,7 +26,7 @@ class _WajahScreenState extends State<WajahScreen> {
   }
 
   Future deleteWajah(String id) async {
-    var response = await http.delete(Uri.parse("$url/$id"));
+    var response = await http.post(Uri.parse("$url/$id"));
     return json.decode(response.body);
   }
 
