@@ -32,12 +32,13 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
 
   String? selectedWarna;
   String? selectedTekstur;
-  String? selectedGaya;
+  String? selectedWajah;
   String? selectedSumber;
+  String? selectedWajahUrl;
   final TextEditingController _panjangController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final String url = 'http://devapp2024.000webhostapp.com/api/gayarambut';
-  final String urlGaya = 'http://devapp2024.000webhostapp.com/api/gaya';
+  final String urlWajah = 'http://devapp2024.000webhostapp.com/api/wajah';
   final String urlWarna = 'http://devapp2024.000webhostapp.com/api/warna';
 
   Future saveGayaRambut() async {
@@ -46,14 +47,14 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
           "panjang": _panjangController.text,
           "id_warna": selectedWarna,
           "tekstur": selectedTekstur,
-          "id_gaya": selectedGaya,
+          "id_wajah": selectedWajah,
           "sumber": selectedSumber
           });
     return json.decode(response.body);
   }
 
-  Future<List<Map<String, dynamic>>> getGaya() async {
-    http.Response response = await http.get(Uri.parse(urlGaya));
+  Future<List<Map<String, dynamic>>> getWajah() async {
+    http.Response response = await http.get(Uri.parse(urlWajah));
 
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body);
@@ -92,7 +93,7 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white, size: 30),
         title: const Text(
-          'Tambah Data Gaya Rambut',
+          'Rekomendasi Gaya Rambut',
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
@@ -107,7 +108,7 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FutureBuilder<List<Map<String, dynamic>>>(
-                future: getGaya(),
+                future: getWajah(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
@@ -116,17 +117,23 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
                   } else {
                     List<Map<String, dynamic>> data = snapshot.data!;
                     return DropdownButton<String>(
-                      value: selectedGaya,
-                      hint: const Text('Pilih Gaya Rambut'),
+                      value: selectedWajah,
+                      hint: const Text('Pilih Foto'),
                       items: data.map((Map<String, dynamic> item) {
                         return DropdownMenuItem<String>(
                           value: item['id'].toString(),
-                          child: Text(item['gaya']),
+                          child: Text(item['nama']),
+                          onTap: () {
+                            setState(() {
+                              selectedWajah = item['id'].toString();
+                              selectedWajahUrl = item['wajah'];
+                            });
+                          },
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
                         setState(() {
-                          selectedGaya = newValue;
+                          selectedWajah = newValue;
                         });
                       },
                     );
@@ -136,19 +143,10 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
               const SizedBox(
                 height: 12,
               ),
-              TextFormField(
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Data panjang harus diisi";
-                  }
-                  return null;
-                },
-                controller: _panjangController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                    hintStyle: TextStyle(color: Colors.grey),
-                    hintText: "Masukkan panjang dalam cm"),
-              ),
+              selectedWajahUrl != null
+                  ? Image.network(
+                      'https://devapp2024.000webhostapp.com/images/$selectedWajahUrl')
+                  : const Text('Tidak Ada Foto Terpilih'),
               const SizedBox(
                 height: 12,
               ),
@@ -189,19 +187,6 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
                 onChanged: (String? newValue) {
                   setState(() {
                     selectedTekstur = newValue!;
-                  });
-                },
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              DropdownButton(
-                value: selectedSumber,
-                hint: const Text('Pilih Sumber'),
-                items: sumberItems,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSumber = newValue!;
                   });
                 },
               ),

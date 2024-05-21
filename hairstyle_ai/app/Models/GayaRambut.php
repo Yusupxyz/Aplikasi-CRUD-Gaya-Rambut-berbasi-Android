@@ -8,15 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class GayaRambut extends Model
 {
     use HasFactory;
-    protected $fillable = ['panjang','id_warna','tekstur','id_gaya','sumber'];
-
-    public function gaya()
-    {
-        return $this->belongsTo(Gaya::class, 'id_gaya', 'id');
-    }
+    protected $fillable = ['panjang','id_warna','tekstur','id_wajah','sumber'];
 
     public function warna()
     {
         return $this->belongsTo(Warna::class, 'id_warna', 'id');
+    }
+
+    public function wajah()
+    {
+        return $this->belongsTo(Wajah::class, 'id_wajah', 'id');
     }
 }
