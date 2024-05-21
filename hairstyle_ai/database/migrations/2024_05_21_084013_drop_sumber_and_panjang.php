@@ -15,7 +15,6 @@ class DropSumberAndPanjang extends Migration
     {
         Schema::table('gaya_rambuts', function (Blueprint $table) {
             $table->dropColumn('sumber');
-            $table->dropColumn('panjang');
         });
     }
 
@@ -28,7 +27,6 @@ class DropSumberAndPanjang extends Migration
     {
         Schema::table('gaya_rambuts', function (Blueprint $table) {
             $table->enum('sumber',['katalog','pelanggan'])->after('tekstur');
-            $table->integer('panjang')->after('tekstur');
         });
     }
 }

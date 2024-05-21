@@ -1,8 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:two_kang_haircut/screen/gaya_rambut/gaya_rambut_screen.dart';
+import 'package:two_kang_haircut/service/chatgpt_service.dart';
 
 class TambahGayaRambutScreen extends StatefulWidget {
   const TambahGayaRambutScreen({super.key});
@@ -12,7 +15,6 @@ class TambahGayaRambutScreen extends StatefulWidget {
 }
 
 class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
-
   List<DropdownMenuItem<String>> get teksturItems {
     List<DropdownMenuItem<String>> menuItems = [
       const DropdownMenuItem(value: "kasar", child: Text("Kasar")),
@@ -31,9 +33,9 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
   }
 
   String? selectedWarna;
+  String? selectedWarnaText;
   String? selectedTekstur;
   String? selectedWajah;
-  String? selectedSumber;
   String? selectedWajahUrl;
   final TextEditingController _panjangController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -42,14 +44,12 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
   final String urlWarna = 'http://devapp2024.000webhostapp.com/api/warna';
 
   Future saveGayaRambut() async {
-    final response = await http
-        .post(Uri.parse(url), body: {
-          "panjang": _panjangController.text,
-          "id_warna": selectedWarna,
-          "tekstur": selectedTekstur,
-          "id_wajah": selectedWajah,
-          "sumber": selectedSumber
-          });
+    final response = await http.post(Uri.parse(url), body: {
+      "panjang": _panjangController.text,
+      "id_warna": selectedWarna,
+      "tekstur": selectedTekstur,
+      "id_wajah": selectedWajah,
+    });
     return json.decode(response.body);
   }
 
@@ -86,6 +86,21 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
       throw Exception('Failed to fetch styles');
     }
   }
+  final ChatGPTService _chatGPTService = ChatGPTService(
+      '');
+  String _response = '';
+
+  void _sendMessage() async {
+    print('sini');
+    final userInput =
+        'Rekomendasi gaya rambut dengan tekstur $selectedTekstur, warna rambut $selectedWarnaText, jenis kelamin laki-laki, panjang rambut sekitar ${_panjangController.text} cm dan bentuk wajah seperti gambar.';
+    print(userInput);
+    final response = await _chatGPTService.getResponse(userInput);
+    // final response = userInput;
+    setState(() {
+      _response = response;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,126 +115,175 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
         backgroundColor: const Color(0xffEB1616),
       ),
       body: SafeArea(
-          child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 27),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: getWajah(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<Map<String, dynamic>> data = snapshot.data!;
-                    return DropdownButton<String>(
-                      value: selectedWajah,
-                      hint: const Text('Pilih Foto'),
-                      items: data.map((Map<String, dynamic> item) {
-                        return DropdownMenuItem<String>(
-                          value: item['id'].toString(),
-                          child: Text(item['nama']),
-                          onTap: () {
-                            setState(() {
-                              selectedWajah = item['id'].toString();
-                              selectedWajahUrl = item['wajah'];
-                            });
-                          },
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedWajah = newValue;
-                        });
-                      },
-                    );
-                  }
-                },
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              selectedWajahUrl != null
-                  ? Image.network(
-                      'https://devapp2024.000webhostapp.com/images/$selectedWajahUrl')
-                  : const Text('Tidak Ada Foto Terpilih'),
-              const SizedBox(
-                height: 12,
-              ),
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: getWarna(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<Map<String, dynamic>> data = snapshot.data!;
-                    return DropdownButton<String>(
-                      value: selectedWarna,
-                      hint: const Text('Pilih Warna'),
-                      items: data.map((Map<String, dynamic> item) {
-                        return DropdownMenuItem<String>(
-                          value: item['id'].toString(),
-                          child: Text(item['warna']),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedWarna = newValue;
-                        });
-                      },
-                    );
-                  }
-                },
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              DropdownButton(
-                value: selectedTekstur,
-                hint: const Text('Pilih Tekstur'),
-                items: teksturItems,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedTekstur = newValue!;
-                  });
-                },
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    saveGayaRambut().then((value) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const GayaRambutScreen()));
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text("Data berhasil disimpan")));
+          child: SingleChildScrollView(
+            child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 27),
+                    child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: getWajah(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<Map<String, dynamic>> data = snapshot.data!;
+                      return DropdownButton<String>(
+                        value: selectedWajah,
+                        hint: const Text('Pilih Foto'),
+                        items: data.map((Map<String, dynamic> item) {
+                          return DropdownMenuItem<String>(
+                            value: item['id'].toString(),
+                            child: Text(item['nama']),
+                            onTap: () {
+                              setState(() {
+                                selectedWajah = item['id'].toString();
+                                selectedWajahUrl = item['wajah'];
+                              });
+                            },
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedWajah = newValue;
+                          });
+                        },
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                Center(
+                  child: selectedWajahUrl != null
+                      ? Image.network(
+                          'https://devapp2024.000webhostapp.com/images/$selectedWajahUrl',
+                          height: 200,
+                        )
+                      : const Text('Tidak Ada Foto Terpilih'),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Data panjang harus diisi";
+                    }
+                    return null;
+                  },
+                  controller: _panjangController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                      hintStyle: TextStyle(color: Colors.grey),
+                      hintText: "Masukkan perkiraan panjang rambut dalam cm"),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: getWarna(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<Map<String, dynamic>> data = snapshot.data!;
+                      return DropdownButton<String>(
+                        value: selectedWarna,
+                        hint: const Text('Pilih Warna'),
+                        items: data.map((Map<String, dynamic> item) {
+                          return DropdownMenuItem<String>(
+                            value: item['id'].toString(),
+                            child: Text(item['warna']),
+                            onTap: () {
+                              setState(() {
+                                selectedWarna = item['id'].toString();
+                                selectedWarnaText = item['warna'];
+                              });
+                            },
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedWarna = newValue;
+                          });
+                        },
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                DropdownButton(
+                  value: selectedTekstur,
+                  hint: const Text('Pilih Tekstur'),
+                  items: teksturItems,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedTekstur = newValue!;
                     });
-                  }
-                },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.blue),
-                  ),
-                  child: const Text(
-                    'Simpan',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  },
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _sendMessage();
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.green),
+                    ),
+                    child: const Text(
+                      'Rekomendasi Gaya Rambut dari AI',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
-              )
-            ],
-          ),
-        ),
-      )),
+                const SizedBox(
+                  height: 12,
+                ),
+                Text(_response),
+                if(_response!='')
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        saveGayaRambut().then((value) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const GayaRambutScreen()));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Data berhasil disimpan")));
+                        });
+                      }
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.blue),
+                    ),
+                    child: const Text(
+                      'Simpan Data',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
+            ),
+                    ),
+                  ),
+          )),
     );
   }
 }
