@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:two_kang_haircut/screen/gaya_rambut/gaya_rambut_screen.dart';
-import 'package:two_kang_haircut/service/chatgpt_service.dart';
+import 'package:two_kang_haircut/util/chatgpt_service.dart';
 
 class EditGayaRambutScreen extends StatefulWidget {
   final Map gayaRambut;

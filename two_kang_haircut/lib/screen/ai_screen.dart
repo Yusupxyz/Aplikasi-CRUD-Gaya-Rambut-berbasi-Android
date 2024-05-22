@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:two_kang_haircut/service/chatgpt_service.dart';
+import 'package:two_kang_haircut/util/chatgpt_service.dart';
 
 class AiScreen extends StatefulWidget {
   const AiScreen({super.key});
