@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:two_kang_haircut/screen/gaya_rambut/gaya_rambut_screen.dart';
 import 'package:two_kang_haircut/service/chatgpt_service.dart';
@@ -92,8 +93,8 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
     }
   }
 
-  final ChatGPTService _chatGPTService = ChatGPTService(
-      'sk-proj-VS4WX7ibge0v1e0T4pmxT3BlbkFJ2Cbh9MRAn3IQjGIm3PwV');
+  final ChatGPTService _chatGPTService =
+      ChatGPTService(dotenv.env['CHATGPT_API_KEY']!);
   String _response = '';
 
   void _sendMessage() async {
@@ -135,9 +136,9 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
       ),
       body: SafeArea(
           child: SingleChildScrollView(
-            child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 27),
-                    child: Form(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 27),
+          child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,9 +322,9 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
                   )
               ],
             ),
-                    ),
-                  ),
-          )),
+          ),
+        ),
+      )),
     );
   }
 }

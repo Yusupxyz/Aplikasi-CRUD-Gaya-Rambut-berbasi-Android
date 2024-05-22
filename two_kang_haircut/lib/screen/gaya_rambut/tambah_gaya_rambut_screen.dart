@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:two_kang_haircut/screen/gaya_rambut/gaya_rambut_screen.dart';
 import 'package:two_kang_haircut/service/chatgpt_service.dart';
@@ -89,8 +90,8 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
     }
   }
 
-  final ChatGPTService _chatGPTService = ChatGPTService(
-      'sk-proj-VS4WX7ibge0v1e0T4pmxT3BlbkFJ2Cbh9MRAn3IQjGIm3PwV');
+  final ChatGPTService _chatGPTService =
+      ChatGPTService(dotenv.env['CHATGPT_API_KEY']!);
   String _response = '';
 
   void _sendMessage() async {
@@ -261,10 +262,12 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
                 if (_response.isNotEmpty)
                   Card(
                     color: Colors.amber,
-                    elevation: 4.0, // Tingkat elevasi untuk memberikan efek bayangan
+                    elevation:
+                        4.0, // Tingkat elevasi untuk memberikan efek bayangan
                     margin: const EdgeInsets.all(8.0), // Margin di sekitar card
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0), // Padding di dalam card
+                      padding:
+                          const EdgeInsets.all(16.0), // Padding di dalam card
                       child: AnimatedTextKit(
                         animatedTexts: [
                           TyperAnimatedText(
@@ -274,7 +277,8 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
-                            speed: const Duration(milliseconds: 100), // Kecepatan ketik
+                            speed: const Duration(
+                                milliseconds: 100), // Kecepatan ketik
                           ),
                         ],
                         isRepeatingAnimation: false, // Hanya animasi sekali

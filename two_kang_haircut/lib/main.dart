@@ -1,11 +1,13 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:two_kang_haircut/screen/gaya_rambut/gaya_rambut_screen.dart';
 import 'package:two_kang_haircut/screen/wajah/wajah_screen.dart';
 import 'package:two_kang_haircut/screen/warna/warna_screen.dart';
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: MainApp()));
 }
 
