@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class GayaRambut extends Model
 {
     use HasFactory;
-    protected $fillable = ['panjang','id_warna','tekstur','id_wajah'];
+    protected $fillable = ['panjang','id_warna','tekstur','id_wajah', 'rekomendasi_ai'];
 
     public function warna()
     {

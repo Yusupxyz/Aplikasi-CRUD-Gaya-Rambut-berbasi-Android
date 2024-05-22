@@ -15,7 +15,7 @@ class _AiScreenState extends State<AiScreen> {
 
   void _sendMessage() async {
     final userInput = _controller.text;
-    final response = await _chatGPTService.getResponse(userInput);
+    final response = await _chatGPTService.getResponse(userInput, '');
     setState(() {
       _response = response;
     });

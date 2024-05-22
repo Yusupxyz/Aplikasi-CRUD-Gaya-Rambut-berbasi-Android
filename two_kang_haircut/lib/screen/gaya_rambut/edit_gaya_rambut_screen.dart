@@ -1,8 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:two_kang_haircut/screen/gaya_rambut/gaya_rambut_screen.dart';
+import 'package:two_kang_haircut/service/chatgpt_service.dart';
 
 class EditGayaRambutScreen extends StatefulWidget {
   final Map gayaRambut;
@@ -31,13 +35,15 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
   }
 
   String? selectedWarna;
+  String? selectedWarnaText;
   String? selectedTekstur;
-  String? selectedGaya;
-  String? selectedSumber;
+  String? selectedWajah;
+  String? selectedWajahUrl;
   final TextEditingController _panjangController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String url = 'http://devapp2024.000webhostapp.com/api/gayarambut/update';
-  final String urlGaya = 'http://devapp2024.000webhostapp.com/api/gaya';
+  final String url =
+      'http://devapp2024.000webhostapp.com/api/gayarambut/update';
+  final String urlWajah = 'http://devapp2024.000webhostapp.com/api/wajah';
   final String urlWarna = 'http://devapp2024.000webhostapp.com/api/warna';
 
   Future updateGayaRambut() async {
@@ -46,14 +52,14 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
       "panjang": _panjangController.text,
       "id_warna": selectedWarna,
       "tekstur": selectedTekstur,
-      "id_gaya": selectedGaya,
-      "sumber": selectedSumber
+      "id_wajah": selectedWajah,
+      "rekomendasi_ai": _response,
     });
     return json.decode(response.body);
   }
 
-  Future<List<Map<String, dynamic>>> getGaya() async {
-    http.Response response = await http.get(Uri.parse(urlGaya));
+  Future<List<Map<String, dynamic>>> getWajah() async {
+    http.Response response = await http.get(Uri.parse(urlWajah));
 
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body);
@@ -86,13 +92,33 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
     }
   }
 
+  final ChatGPTService _chatGPTService = ChatGPTService(
+      'sk-proj-VS4WX7ibge0v1e0T4pmxT3BlbkFJ2Cbh9MRAn3IQjGIm3PwV');
+  String _response = '';
+
+  void _sendMessage() async {
+    print('sini');
+    final userInput =
+        'Rekomendasi gaya rambut dengan tekstur $selectedTekstur, warna rambut $selectedWarnaText, jenis kelamin laki-laki, panjang rambut sekitar ${_panjangController.text} cm dan bentuk wajah seperti gambar.';
+    print(userInput);
+    final url = 'https://devapp2024.000webhostapp.com/images/$selectedWajahUrl';
+    print(url);
+
+    final response = await _chatGPTService.getResponse(userInput, url);
+    // final response = userInput;
+    setState(() {
+      _response = response;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     selectedWarna = '${widget.gayaRambut['id_warna']}';
-    selectedGaya = '${widget.gayaRambut['id_gaya']}';
+    selectedWajah = '${widget.gayaRambut['id_wajah']}';
     selectedTekstur = '${widget.gayaRambut['tekstur']}';
-    selectedSumber = '${widget.gayaRambut['sumber']}';
+    selectedWajahUrl = '${widget.gayaRambut['wajah']['wajah']}';
+    _response = '${widget.gayaRambut['rekomendasi_ai']}';
   }
 
   @override
@@ -116,7 +142,7 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FutureBuilder<List<Map<String, dynamic>>>(
-                future: getGaya(),
+                future: getWajah(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
@@ -125,22 +151,39 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
                   } else {
                     List<Map<String, dynamic>> data = snapshot.data!;
                     return DropdownButton<String>(
-                      value: selectedGaya,
-                      hint: const Text('Pilih Gaya Rambut'),
+                      value: selectedWajah,
+                      hint: const Text('Pilih Foto'),
                       items: data.map((Map<String, dynamic> item) {
                         return DropdownMenuItem<String>(
                           value: item['id'].toString(),
-                          child: Text(item['gaya']),
+                          child: Text(item['wajah']),
+                          onTap: () {
+                            setState(() {
+                              selectedWajah = item['id'].toString();
+                              selectedWajahUrl = item['wajah'];
+                            });
+                          },
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
                         setState(() {
-                          selectedGaya = newValue;
+                          selectedWajah = newValue;
                         });
                       },
                     );
                   }
                 },
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              Center(
+                child: selectedWajahUrl != null
+                    ? Image.network(
+                        'https://devapp2024.000webhostapp.com/images/$selectedWajahUrl',
+                        height: 200,
+                      )
+                    : const Text('Tidak Ada Foto Terpilih'),
               ),
               const SizedBox(
                 height: 12,
@@ -157,7 +200,7 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                     hintStyle: TextStyle(color: Colors.grey),
-                    hintText: "Masukkan panjang dalam cm"),
+                    hintText: "Masukkan perkiraan panjang rambut dalam cm"),
               ),
               const SizedBox(
                 height: 12,
@@ -205,44 +248,76 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
               const SizedBox(
                 height: 12,
               ),
-              DropdownButton(
-                value: selectedSumber,
-                hint: const Text('Pilih Sumber'),
-                items: sumberItems,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSumber = newValue!;
-                  });
-                },
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    _sendMessage();
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.green),
+                  ),
+                  child: const Text(
+                    'Rekomendasi Gaya Rambut dari AI',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
               ),
               const SizedBox(
                 height: 12,
               ),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      updateGayaRambut().then((value) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const GayaRambutScreen()));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Data berhasil diubah")));
-                      });
-                    }
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.blue),
-                  ),
-                  child: const Text(
-                    'Simpan',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+              if (_response.isNotEmpty)
+                Card(
+                  color: Colors.amber,
+                  elevation:
+                      4.0, // Tingkat elevasi untuk memberikan efek bayangan
+                  margin: const EdgeInsets.all(8.0), // Margin di sekitar card
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.all(16.0), // Padding di dalam card
+                    child: AnimatedTextKit(
+                      animatedTexts: [
+                        TyperAnimatedText(
+                          _response,
+                          textStyle: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                          speed: const Duration(
+                              milliseconds: 100), // Kecepatan ketik
+                        ),
+                      ],
+                      isRepeatingAnimation: false, // Hanya animasi sekali
+                      totalRepeatCount: 1,
+                    ),
                   ),
                 ),
-              )
+              if (_response != '')
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        updateGayaRambut().then((value) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const GayaRambutScreen()));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Data berhasil diubah")));
+                        });
+                      }
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.blue),
+                    ),
+                    child: const Text(
+                      'Simpan Hasil Rekomendasi AI',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                )
             ],
           ),
         ),

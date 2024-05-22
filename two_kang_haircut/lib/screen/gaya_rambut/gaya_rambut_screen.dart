@@ -20,7 +20,9 @@ class _GayaRambutScreenState extends State<GayaRambutScreen> {
   @override
   Widget build(BuildContext context) {
     const String url = 'http://devapp2024.000webhostapp.com/api/gayarambut';
-    const String urlDelete = 'http://devapp2024.000webhostapp.com/api/gayarambut/delete';
+    const String urlDelete =
+        'http://devapp2024.000webhostapp.com/api/gayarambut/delete';
+    const String urlStorage = 'http://devapp2024.000webhostapp.com/images/';
 
     Future getGayaRambut() async {
       var response = await http.get(Uri.parse(url));
@@ -36,7 +38,7 @@ class _GayaRambutScreenState extends State<GayaRambutScreen> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white, size: 30),
         title: const Text(
-          'Data Gaya Rambut',
+          'Data Rekomendasi Gaya Rambut',
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
@@ -67,20 +69,29 @@ class _GayaRambutScreenState extends State<GayaRambutScreen> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5),
                           child: ListTile(
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Image.network(
+                                urlStorage +
+                                    snapshot.data['data'][index]['wajah']['wajah'],
+                                height: 150.0,
+                                width: 100.0,
+                              ),
+                            ),
                             title: RichText(
                                 text: TextSpan(
                                     text:
-                                        '${snapshot.data['data'][index]['gaya']['gaya']}',
+                                        '${(snapshot.data['data'][index]['rekomendasi_ai']).substring(0,40)} .....',
                                     style: const TextStyle(
-                                        fontSize: 20,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black),
                                     children: [
                                   TextSpan(
                                       text:
-                                          '\nPanjang: ${snapshot.data['data'][index]["panjang"]} cm\nWarna: ${snapshot.data['data'][index]["warna"]['warna']}\nTekstur: ${StringUtils.capitalize("${snapshot.data['data'][index]["tekstur"]}")}\nSumber: ${StringUtils.capitalize("${snapshot.data['data'][index]["sumber"]}")}',
+                                          '\nPanjang: ${snapshot.data['data'][index]["panjang"]} cm\nWarna: ${snapshot.data['data'][index]["warna"]['warna']}\nTekstur: ${StringUtils.capitalize("${snapshot.data['data'][index]["tekstur"]}")}',
                                       style: const TextStyle(
-                                          fontSize: 17,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.normal)),
                                 ])),
                             trailing: Column(

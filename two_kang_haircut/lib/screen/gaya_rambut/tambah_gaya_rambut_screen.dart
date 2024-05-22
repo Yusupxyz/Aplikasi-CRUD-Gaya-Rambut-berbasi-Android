@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:two_kang_haircut/screen/gaya_rambut/gaya_rambut_screen.dart';
@@ -49,6 +50,7 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
       "id_warna": selectedWarna,
       "tekstur": selectedTekstur,
       "id_wajah": selectedWajah,
+      "rekomendasi_ai": _response,
     });
     return json.decode(response.body);
   }
@@ -86,8 +88,9 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
       throw Exception('Failed to fetch styles');
     }
   }
+
   final ChatGPTService _chatGPTService = ChatGPTService(
-      '');
+      'sk-proj-VS4WX7ibge0v1e0T4pmxT3BlbkFJ2Cbh9MRAn3IQjGIm3PwV');
   String _response = '';
 
   void _sendMessage() async {
@@ -95,7 +98,10 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
     final userInput =
         'Rekomendasi gaya rambut dengan tekstur $selectedTekstur, warna rambut $selectedWarnaText, jenis kelamin laki-laki, panjang rambut sekitar ${_panjangController.text} cm dan bentuk wajah seperti gambar.';
     print(userInput);
-    final response = await _chatGPTService.getResponse(userInput);
+    final url = 'https://devapp2024.000webhostapp.com/images/$selectedWajahUrl';
+    print(url);
+
+    final response = await _chatGPTService.getResponse(userInput, url);
     // final response = userInput;
     setState(() {
       _response = response;
@@ -116,9 +122,9 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
       ),
       body: SafeArea(
           child: SingleChildScrollView(
-            child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 27),
-                    child: Form(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 27),
+          child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,38 +258,61 @@ class _TambahGayaRambutScreenState extends State<TambahGayaRambutScreen> {
                 const SizedBox(
                   height: 12,
                 ),
-                Text(_response),
-                if(_response!='')
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        saveGayaRambut().then((value) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const GayaRambutScreen()));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Data berhasil disimpan")));
-                        });
-                      }
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.blue),
-                    ),
-                    child: const Text(
-                      'Simpan Data',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                if (_response.isNotEmpty)
+                  Card(
+                    color: Colors.amber,
+                    elevation: 4.0, // Tingkat elevasi untuk memberikan efek bayangan
+                    margin: const EdgeInsets.all(8.0), // Margin di sekitar card
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0), // Padding di dalam card
+                      child: AnimatedTextKit(
+                        animatedTexts: [
+                          TyperAnimatedText(
+                            _response,
+                            textStyle: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            speed: const Duration(milliseconds: 100), // Kecepatan ketik
+                          ),
+                        ],
+                        isRepeatingAnimation: false, // Hanya animasi sekali
+                        totalRepeatCount: 1,
+                      ),
                     ),
                   ),
-                )
+                if (_response != '')
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          saveGayaRambut().then((value) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const GayaRambutScreen()));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Data berhasil disimpan")));
+                          });
+                        }
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.blue),
+                      ),
+                      child: const Text(
+                        'Simpan Hasil Rekomendasi AI',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  )
               ],
             ),
-                    ),
-                  ),
-          )),
+          ),
+        ),
+      )),
     );
   }
 }
