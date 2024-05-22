@@ -127,201 +127,203 @@ class _EditGayaRambutScreenState extends State<EditGayaRambutScreen> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white, size: 30),
         title: const Text(
-          'Tambah Data Gaya Rambut',
+          'Ubah Data Gaya Rambut',
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: const Color(0xffEB1616),
       ),
       body: SafeArea(
-          child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 27),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: getWajah(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<Map<String, dynamic>> data = snapshot.data!;
-                    return DropdownButton<String>(
-                      value: selectedWajah,
-                      hint: const Text('Pilih Foto'),
-                      items: data.map((Map<String, dynamic> item) {
-                        return DropdownMenuItem<String>(
-                          value: item['id'].toString(),
-                          child: Text(item['wajah']),
-                          onTap: () {
-                            setState(() {
-                              selectedWajah = item['id'].toString();
-                              selectedWajahUrl = item['wajah'];
-                            });
-                          },
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedWajah = newValue;
-                        });
-                      },
-                    );
-                  }
-                },
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Center(
-                child: selectedWajahUrl != null
-                    ? Image.network(
-                        'https://devapp2024.000webhostapp.com/images/$selectedWajahUrl',
-                        height: 200,
-                      )
-                    : const Text('Tidak Ada Foto Terpilih'),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              TextFormField(
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Data panjang harus diisi";
-                  }
-                  return null;
-                },
-                controller: _panjangController
-                  ..text = '${widget.gayaRambut['panjang']}',
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                    hintStyle: TextStyle(color: Colors.grey),
-                    hintText: "Masukkan perkiraan panjang rambut dalam cm"),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: getWarna(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<Map<String, dynamic>> data = snapshot.data!;
-                    return DropdownButton<String>(
-                      value: selectedWarna,
-                      hint: const Text('Pilih Warna'),
-                      items: data.map((Map<String, dynamic> item) {
-                        return DropdownMenuItem<String>(
-                          value: item['id'].toString(),
-                          child: Text(item['warna']),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedWarna = newValue;
-                        });
-                      },
-                    );
-                  }
-                },
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              DropdownButton(
-                value: selectedTekstur,
-                hint: const Text('Pilih Tekstur'),
-                items: teksturItems,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedTekstur = newValue!;
-                  });
-                },
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    _sendMessage();
+          child: SingleChildScrollView(
+            child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 27),
+                    child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: getWajah(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<Map<String, dynamic>> data = snapshot.data!;
+                      return DropdownButton<String>(
+                        value: selectedWajah,
+                        hint: const Text('Pilih Foto'),
+                        items: data.map((Map<String, dynamic> item) {
+                          return DropdownMenuItem<String>(
+                            value: item['id'].toString(),
+                            child: Text(item['wajah']),
+                            onTap: () {
+                              setState(() {
+                                selectedWajah = item['id'].toString();
+                                selectedWajahUrl = item['wajah'];
+                              });
+                            },
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedWajah = newValue;
+                          });
+                        },
+                      );
+                    }
                   },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.green),
-                  ),
-                  child: const Text(
-                    'Rekomendasi Gaya Rambut dari AI',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              if (_response.isNotEmpty)
-                Card(
-                  color: Colors.amber,
-                  elevation:
-                      4.0, // Tingkat elevasi untuk memberikan efek bayangan
-                  margin: const EdgeInsets.all(8.0), // Margin di sekitar card
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.all(16.0), // Padding di dalam card
-                    child: AnimatedTextKit(
-                      animatedTexts: [
-                        TyperAnimatedText(
-                          _response,
-                          textStyle: const TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                          speed: const Duration(
-                              milliseconds: 100), // Kecepatan ketik
-                        ),
-                      ],
-                      isRepeatingAnimation: false, // Hanya animasi sekali
-                      totalRepeatCount: 1,
-                    ),
-                  ),
+                const SizedBox(
+                  height: 12,
                 ),
-              if (_response != '')
+                Center(
+                  child: selectedWajahUrl != null
+                      ? Image.network(
+                          'https://devapp2024.000webhostapp.com/images/$selectedWajahUrl',
+                          height: 200,
+                        )
+                      : const Text('Tidak Ada Foto Terpilih'),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Data panjang harus diisi";
+                    }
+                    return null;
+                  },
+                  controller: _panjangController
+                    ..text = '${widget.gayaRambut['panjang']}',
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                      hintStyle: TextStyle(color: Colors.grey),
+                      hintText: "Masukkan perkiraan panjang rambut dalam cm"),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: getWarna(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<Map<String, dynamic>> data = snapshot.data!;
+                      return DropdownButton<String>(
+                        value: selectedWarna,
+                        hint: const Text('Pilih Warna'),
+                        items: data.map((Map<String, dynamic> item) {
+                          return DropdownMenuItem<String>(
+                            value: item['id'].toString(),
+                            child: Text(item['warna']),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedWarna = newValue;
+                          });
+                        },
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                DropdownButton(
+                  value: selectedTekstur,
+                  hint: const Text('Pilih Tekstur'),
+                  items: teksturItems,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedTekstur = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        updateGayaRambut().then((value) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const GayaRambutScreen()));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Data berhasil diubah")));
-                        });
-                      }
+                      _sendMessage();
                     },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.blue),
+                      backgroundColor: MaterialStateProperty.all(Colors.green),
                     ),
                     child: const Text(
-                      'Simpan Hasil Rekomendasi AI',
+                      'Rekomendasi Gaya Rambut dari AI',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
-                )
-            ],
-          ),
-        ),
-      )),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                if (_response.isNotEmpty)
+                  Card(
+                    color: Colors.amber,
+                    elevation:
+                        4.0, // Tingkat elevasi untuk memberikan efek bayangan
+                    margin: const EdgeInsets.all(8.0), // Margin di sekitar card
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.all(16.0), // Padding di dalam card
+                      child: AnimatedTextKit(
+                        animatedTexts: [
+                          TyperAnimatedText(
+                            _response,
+                            textStyle: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            speed: const Duration(
+                                milliseconds: 100), // Kecepatan ketik
+                          ),
+                        ],
+                        isRepeatingAnimation: false, // Hanya animasi sekali
+                        totalRepeatCount: 1,
+                      ),
+                    ),
+                  ),
+                if (_response != '')
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          updateGayaRambut().then((value) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const GayaRambutScreen()));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Data berhasil diubah")));
+                          });
+                        }
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.blue),
+                      ),
+                      child: const Text(
+                        'Simpan Hasil Rekomendasi AI',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  )
+              ],
+            ),
+                    ),
+                  ),
+          )),
     );
   }
 }
